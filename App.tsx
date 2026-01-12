@@ -175,6 +175,15 @@ const App: React.FC = () => {
                     Download ZIP
                  </a>
              )}
+
+             <div className="pt-2 text-center border-t border-slate-100 mt-2">
+                <p className="text-[10px] text-slate-400 font-medium">
+                  Developed by <a href="https://www.LandWorksPro.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 hover:underline transition-colors">LandWorks Services LLC</a>
+                </p>
+                <p className="text-[10px] text-slate-400">
+                   Michael Kintner
+                </p>
+             </div>
         </div>
       </aside>
 
