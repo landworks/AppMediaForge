@@ -67,7 +67,7 @@ const App: React.FC = () => {
     }
   };
 
-  const safeProjectFilename = projectName.replace(/[^a-z0-9 _-]/gi, '').trim() || 'Assets';
+  const safeProjectFilename = projectName.replace(/[^a-z0-9 _-]/gi, '').trim() || 'Project';
 
   return (
     <div className="flex h-screen bg-white">
@@ -77,7 +77,7 @@ const App: React.FC = () => {
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                  <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                  </svg>
             </div>
             <h1 className="text-lg font-bold text-slate-900 tracking-tight">AppMediaForge</h1>
@@ -104,7 +104,7 @@ const App: React.FC = () => {
                  <a 
                     href={downloadUrl}
                     className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
-                    download={`${safeProjectFilename}_AppAssets.zip`}
+                    download={`${safeProjectFilename}_AppMedia_Forge.zip`}
                  >
                     <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />

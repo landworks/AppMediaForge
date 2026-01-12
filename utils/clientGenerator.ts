@@ -4,9 +4,10 @@ import { SUPPORTED_DEVICES } from '../constants';
 
 export const generateAssetsZip = async (assets: UploadedAsset[], config: GenerationConfig, projectName: string): Promise<string> => {
   const zip = new JSZip();
-  // Structure: Project Name -> Platform -> Locale -> Device -> Orientation
-  const safeProjectName = projectName.replace(/[^a-z0-9 _-]/gi, '_').trim() || "AppAssets";
-  const rootFolder = zip.folder(safeProjectName);
+  // Structure: ProjectName_AppMedia_Forge -> Platform -> Locale -> Device -> Orientation
+  const sanitizedName = projectName.replace(/[^a-z0-9 _-]/gi, '_').trim() || "Project";
+  const rootFolderName = `${sanitizedName}_AppMedia_Forge`;
+  const rootFolder = zip.folder(rootFolderName);
 
   // Iterate with index to generate ordered filenames (001, 002...)
   for (let i = 0; i < assets.length; i++) {
@@ -120,7 +121,7 @@ export const generateAssetsZip = async (assets: UploadedAsset[], config: Generat
       // 7. Export to Blob
       const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
       if (blob) {
-          // Structure: /ProjectName/Platform/Locale/DeviceName/Orientation/Filename
+          // Structure: /ProjectName_AppMedia_Forge/Platform/Locale/DeviceName/Orientation/Filename
           const safeDeviceName = device.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
           const fileName = `screenshot_${sequenceNum}_${targetW}x${targetH}.png`;
           
