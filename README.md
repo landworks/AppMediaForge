@@ -61,15 +61,49 @@ A web-based automation tool to generate App Store Connect-ready screenshots.
 1.  **Frontend:**
     This output is a React SPA scaffold.
     ```bash
-    npm install react react-dom react-scripts typescript @types/react @types/node sharp
-    npm start
+    npm install
+    npm run dev
     ```
 
-2.  **Backend Integration (Next.js):**
-    -   Copy `server/imageProcessor.ts` to your Next.js API route handler.
-    -   Ensure `sharp` is installed (`npm install sharp`).
+## Deployment Guide (Hostinger / WordPress)
 
-## GCP Deployment (Deliverable G)
+This app is configured as a static site, meaning it runs entirely in the browser and does not require a Node.js server for the basic functionality.
+
+### Build the App
+Run the following command on your local machine:
+```bash
+npm run build
+```
+This creates a `dist` folder containing the HTML, CSS, and JS files.
+
+### Method 1: Hostinger Subfolder (Standalone)
+This allows you to access the tool via `yourdomain.com/tools/media-forge`.
+
+1.  Log in to Hostinger -> **File Manager**.
+2.  Navigate to `public_html`.
+3.  Create a folder named `media-forge` (or whatever you prefer).
+4.  **Upload** the *contents* of your local `dist` folder into this new folder.
+5.  Visit `www.yourdomain.com/media-forge`.
+
+### Method 2: Embed inside WordPress
+To display the tool inside a WordPress page (keeping your site's header/footer):
+
+1.  Follow **Method 1** to upload the files to a subfolder (e.g., `media-forge`).
+2.  Log in to WordPress Admin.
+3.  Create a new Page.
+4.  Add a **Custom HTML** block.
+5.  Paste the following code:
+    ```html
+    <iframe 
+      src="/media-forge/index.html" 
+      style="width: 100%; height: 100vh; min-height: 800px; border: none;" 
+      title="App Store Asset Manager"
+    ></iframe>
+    ```
+
+## GCP Deployment (Optional - For Cloud Processing)
+
+If you enable the server-side features (Phase 2), follow these steps:
 
 1.  **Build Container:**
     Create a `Dockerfile` that installs dependencies and builds the Next.js app.
