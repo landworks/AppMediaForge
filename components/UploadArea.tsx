@@ -1,3 +1,6 @@
+/**
+ * Developed by LandWorks Services LLC, developer Michael Kintner
+ */
 import React, { useCallback, useState } from 'react';
 import { UploadedAsset } from '../types';
 

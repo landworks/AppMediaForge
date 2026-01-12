@@ -1,13 +1,17 @@
-import React from 'react';
+/**
+ * Developed by LandWorks Services LLC, developer Michael Kintner
+ */
+import React, { useMemo } from 'react';
 import { GenerationConfig, Orientation, CaptionConfig } from '../types';
 import { SUPPORTED_DEVICES } from '../constants';
 
 interface ConfigPanelProps {
   config: GenerationConfig;
   onChange: (newConfig: GenerationConfig) => void;
+  onApplySplits?: () => void;
 }
 
-export const ConfigPanel: React.FC<ConfigPanelProps> = ({ config, onChange }) => {
+export const ConfigPanel: React.FC<ConfigPanelProps> = ({ config, onChange, onApplySplits }) => {
 
   const toggleDevice = (id: string) => {
     const current = config.selectedDeviceIds;
@@ -32,6 +36,42 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({ config, onChange }) =>
     onChange({ ...config, captions: newCaptions });
   };
 
+  // Calculate recommended dimensions for Panorama
+  const recommendedDimensions = useMemo(() => {
+    if (config.mode !== 'panorama' || config.selectedDeviceIds.length === 0) return null;
+
+    // Filter selected devices and find the largest one to recommend as source
+    const selectedDevices = SUPPORTED_DEVICES.filter(d => config.selectedDeviceIds.includes(d.id));
+    
+    // Sort by resolution area descending
+    const sorted = [...selectedDevices].sort((a, b) => {
+        const areaA = a.acceptedSizes[0].width * a.acceptedSizes[0].height;
+        const areaB = b.acceptedSizes[0].width * b.acceptedSizes[0].height;
+        return areaB - areaA;
+    });
+
+    const bestDevice = sorted[0];
+    if (!bestDevice) return null;
+
+    const size = bestDevice.acceptedSizes[0];
+    const isPortrait = config.orientation === 'portrait';
+    
+    // Single Screen Dimensions
+    const w = isPortrait ? Math.min(size.width, size.height) : Math.max(size.width, size.height);
+    const h = isPortrait ? Math.max(size.width, size.height) : Math.min(size.width, size.height);
+
+    // Canvas Dimensions
+    const canvasW = w * config.panoramaCount;
+    const canvasH = h;
+
+    return {
+        deviceName: bestDevice.name,
+        width: canvasW,
+        height: canvasH
+    };
+  }, [config.mode, config.selectedDeviceIds, config.orientation, config.panoramaCount]);
+
+
   // Dark theme input styles
   const inputClass = "w-full text-sm bg-slate-700 text-white border-slate-600 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 placeholder-slate-400";
 
@@ -41,6 +81,79 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({ config, onChange }) =>
 
   return (
     <div className="space-y-8 p-1">
+      {/* Marketing Feature / Mode */}
+      <section>
+          <h3 className="text-sm font-semibold text-slate-900 mb-3 uppercase tracking-wider">Marketing Mode</h3>
+          <div className="bg-white border border-slate-200 rounded-lg p-1 flex mb-3">
+              <button
+                onClick={() => onChange({ ...config, mode: 'standard' })}
+                className={`flex-1 py-2 text-xs font-medium rounded-md transition-colors ${config.mode === 'standard' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-50'}`}
+              >
+                  Standard
+              </button>
+              <button
+                onClick={() => onChange({ ...config, mode: 'panorama' })}
+                className={`flex-1 py-2 text-xs font-medium rounded-md transition-colors ${config.mode === 'panorama' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-50'}`}
+              >
+                  Panorama
+              </button>
+          </div>
+          
+          {config.mode === 'panorama' && (
+              <div className="bg-slate-100 p-3 rounded-lg border border-slate-200 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <label className="block text-xs font-bold text-slate-700 mb-2">Screens to Split</label>
+                  <div className="flex space-x-2 mb-3">
+                      {[2, 3, 4].map(num => (
+                          <button
+                            key={num}
+                            onClick={() => onChange({...config, panoramaCount: num})}
+                            className={`flex-1 py-1.5 text-xs border rounded transition-colors ${
+                                config.panoramaCount === num 
+                                ? 'bg-white border-blue-500 text-blue-700 ring-1 ring-blue-500 font-bold' 
+                                : 'bg-white border-slate-300 text-slate-600 hover:border-slate-400'
+                            }`}
+                          >
+                              {num} Screens
+                          </button>
+                      ))}
+                  </div>
+
+                  {onApplySplits && (
+                      <button 
+                        onClick={onApplySplits}
+                        className="w-full mb-3 flex items-center justify-center py-2 bg-red-600 text-white text-xs font-bold rounded hover:bg-red-700 shadow-sm transition-colors"
+                      >
+                         <svg className="w-3 h-3 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                         </svg>
+                         Save Splits & Switch to Standard
+                      </button>
+                  )}
+                  
+                  <p className="text-[10px] text-slate-500 leading-tight">
+                      Creates a {config.panoramaCount}-screen wide canvas. Uploaded image will be sliced into {config.panoramaCount} Apple-compliant files.
+                  </p>
+
+                  {recommendedDimensions && (
+                    <div className="mt-3 p-2 bg-white border border-blue-200 rounded text-[11px] text-blue-800 shadow-sm">
+                        <div className="flex items-center mb-1">
+                            <svg className="w-3 h-3 mr-1 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span className="font-bold">Recommended Source Size</span>
+                        </div>
+                        <div className="text-lg font-mono font-bold text-slate-800 leading-none mb-1">
+                            {recommendedDimensions.width} <span className="text-slate-400">x</span> {recommendedDimensions.height}
+                        </div>
+                        <div className="text-slate-500">
+                            Based on {recommendedDimensions.deviceName}
+                        </div>
+                    </div>
+                  )}
+              </div>
+          )}
+      </section>
+
       {/* Target Devices */}
       <section>
         <h3 className="text-sm font-semibold text-slate-900 mb-3 uppercase tracking-wider">Target Devices</h3>
@@ -170,6 +283,11 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({ config, onChange }) =>
                  <span>Bottom</span>
              </label>
         </div>
+        {config.mode === 'panorama' && (
+            <p className="text-[10px] text-amber-600 mt-2 bg-amber-50 p-2 rounded">
+                Note: In Panorama mode, captions are centered across the full width canvas.
+            </p>
+        )}
       </section>
     </div>
   );

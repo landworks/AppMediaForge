@@ -1,3 +1,6 @@
+/**
+ * Developed by LandWorks Services LLC, developer Michael Kintner
+ */
 import { DeviceDefinition } from './types';
 
 // Source: Apple App Store Connect & Google Play Specifications

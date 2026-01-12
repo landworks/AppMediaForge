@@ -1,10 +1,16 @@
 /**
+ * Developed by LandWorks Services LLC, developer Michael Kintner
+ */
+
+/**
  * Data Model for Device Display Classes
  */
 export enum Orientation {
   PORTRAIT = 'portrait',
   LANDSCAPE = 'landscape',
 }
+
+export type GenerationMode = 'standard' | 'panorama';
 
 export interface Dimension {
   width: number;
@@ -33,6 +39,8 @@ export interface CaptionConfig {
 }
 
 export interface GenerationConfig {
+  mode: GenerationMode; // New: Standard or Panorama
+  panoramaCount: number; // New: 2, 3, or 4 screens
   selectedDeviceIds: string[]; // IDs from DeviceDefinition
   orientation: Orientation;
   locales: string[]; // e.g., 'en-US', 'es-ES'

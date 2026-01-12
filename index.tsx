@@ -1,3 +1,6 @@
+/**
+ * Developed by LandWorks Services LLC, developer Michael Kintner
+ */
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';

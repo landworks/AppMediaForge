@@ -1,3 +1,7 @@
+/**
+ * Developed by LandWorks Services LLC, developer Michael Kintner
+ */
+
 // NOTE: This file is intended to run in a Node.js environment (Next.js API Route)
 // It will not run in the browser. 
 // Deliverable E (Backend Logic)

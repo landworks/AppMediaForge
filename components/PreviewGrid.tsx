@@ -1,3 +1,6 @@
+/**
+ * Developed by LandWorks Services LLC, developer Michael Kintner
+ */
 import React, { useMemo } from 'react';
 import { DeviceDefinition, GenerationConfig, UploadedAsset } from '../types';
 import { SUPPORTED_DEVICES } from '../constants';
@@ -16,7 +19,10 @@ const SimulatedPreview: React.FC<{
   
   // Find the largest accepted size for aspect ratio calculation
   const targetSize = device.acceptedSizes[0];
-  const aspectRatio = targetSize.width / targetSize.height;
+  const isPortrait = config.orientation === 'portrait';
+  const width = isPortrait ? Math.min(targetSize.width, targetSize.height) : Math.max(targetSize.width, targetSize.height);
+  const height = isPortrait ? Math.max(targetSize.width, targetSize.height) : Math.min(targetSize.width, targetSize.height);
+  const aspectRatio = width / height;
   
   const bgStyle: React.CSSProperties = config.background.type === 'solid' 
     ? { backgroundColor: config.background.value } 
@@ -24,6 +30,90 @@ const SimulatedPreview: React.FC<{
 
   const objectFit = config.fitMode === 'contain' ? 'contain' : 'cover';
 
+  // --- PANORAMA RENDERING LOGIC ---
+  if (config.mode === 'panorama') {
+      const count = config.panoramaCount || 2;
+      const slices = Array.from({ length: count });
+
+      return (
+        <div className="flex flex-col space-y-2 w-full col-span-2 md:col-span-2 lg:col-span-2">
+            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex justify-between">
+                <span>{device.name} (Panorama {count}-Screen)</span>
+                <span className="text-[10px] bg-blue-100 text-blue-800 px-2 rounded-full">Merged Preview</span>
+            </div>
+            
+            <div className="flex space-x-1 overflow-hidden">
+                {slices.map((_, index) => (
+                    <div 
+                        key={index}
+                        className="relative rounded-lg overflow-hidden border border-slate-200 shadow-sm flex-1 group"
+                        style={{ aspectRatio: aspectRatio }}
+                    >
+                         {/* Background Layer (Per slice, but conceptual wide background) */}
+                         <div className="absolute inset-0 z-0" style={bgStyle} />
+                         
+                         {/* Image Layer - Simulated Slicing via CSS */}
+                         {/* The container is 1 unit wide. We want to show a 1/N slice of the Total Width. */}
+                         {/* If we treat the image as 'cover' across the WHOLE width: */}
+                         {/* Total Width = N units. This div is 1 unit. */}
+                         {/* We need an inner container that is N units wide, shifted left by index units. */}
+                         
+                         <div className="absolute inset-0 z-10 overflow-hidden">
+                             <div 
+                                style={{
+                                    width: `${count * 100}%`, // 300% width for 3 screens
+                                    height: '100%',
+                                    marginLeft: `-${index * 100}%`, // Shift left: 0, -100%, -200%
+                                    position: 'relative',
+                                    display: 'flex',
+                                }}
+                             >
+                                 {/* The Image inside the Wide Container */}
+                                 {/* We apply flex centering to handle 'contain' vs 'cover' on the wide canvas */}
+                                 <div className="w-full h-full flex items-center justify-center relative">
+                                      <img 
+                                        src={asset.previewUrl} 
+                                        alt="Preview" 
+                                        className="max-w-none transition-transform duration-300"
+                                        style={{ 
+                                            width: config.fitMode === 'cover' ? '100%' : 'auto',
+                                            height: config.fitMode === 'cover' ? 'auto' : (config.fitMode === 'contain' ? '90%' : '100%'), // 90% for padding in contain
+                                            objectFit: config.fitMode === 'cover' ? 'cover' : 'contain',
+                                            minHeight: config.fitMode === 'cover' ? '100%' : '0'
+                                        }}
+                                      />
+                                      
+                                      {/* Caption Overlay - Centered on Wide Canvas */}
+                                      {config.captions['en-US']?.text && (
+                                        <div className={`absolute left-0 right-0 p-4 z-20 flex justify-center text-center ${config.captions['en-US'].position === 'top' ? 'top-[5%]' : 'bottom-[5%]'}`}>
+                                            <span 
+                                                style={{ 
+                                                color: config.captions['en-US'].color,
+                                                fontSize: '12px', 
+                                                fontFamily: config.captions['en-US'].fontFamily,
+                                                whiteSpace: 'nowrap'
+                                                }}
+                                                className="font-bold drop-shadow-md"
+                                            >
+                                                {config.captions['en-US'].text}
+                                            </span>
+                                        </div>
+                                      )}
+                                 </div>
+                             </div>
+                         </div>
+                         
+                         <div className="absolute bottom-2 right-2 z-30 bg-black/50 text-white text-[10px] px-1.5 py-0.5 rounded">
+                            Part {index + 1}
+                         </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+      );
+  }
+
+  // --- STANDARD RENDERING LOGIC ---
   return (
     <div className="flex flex-col space-y-2">
       <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{device.name}</div>
@@ -59,7 +149,7 @@ const SimulatedPreview: React.FC<{
         )}
 
         <div className="absolute bottom-2 right-2 z-30 bg-black/50 text-white text-[10px] px-1.5 py-0.5 rounded">
-          {targetSize.width}x{targetSize.height}
+          {width}x{height}
         </div>
       </div>
     </div>
@@ -80,7 +170,7 @@ export const PreviewGrid: React.FC<PreviewGridProps> = ({ assets, config }) => {
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div className={`grid gap-6 ${config.mode === 'panorama' ? 'grid-cols-1' : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'}`}>
       {assets.map((asset) => (
         <React.Fragment key={asset.id}>
           {targetDevices.map(device => (
