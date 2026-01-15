@@ -141,7 +141,7 @@ const App: React.FC = () => {
             </div>
             <h1 className="text-lg font-bold text-slate-900 tracking-tight">AppMediaForge</h1>
           </div>
-          <p className="text-xs text-slate-500 mt-1">Ver 1.2.0 - App Store Asset Manager</p>
+          <p className="text-xs text-slate-500 mt-1">Ver 1.3.1 - App Store Asset Manager</p>
         </div>
         
         <div className="flex-1 overflow-y-auto p-5 scrollbar-hide">
@@ -202,7 +202,7 @@ const App: React.FC = () => {
                  />
              </div>
              <div className="flex items-center space-x-4">
-                 <div className="text-xs text-slate-400">v1.2.0 (Multi-Platform)</div>
+                 <div className="text-xs text-slate-400">v1.3.1 (Multi-Platform)</div>
              </div>
          </header>
 

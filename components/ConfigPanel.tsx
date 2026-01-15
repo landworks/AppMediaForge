@@ -77,6 +77,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({ config, onChange, onAp
 
   // Group devices
   const iosDevices = SUPPORTED_DEVICES.filter(d => d.platform === 'iOS');
+  const ipadDevices = SUPPORTED_DEVICES.filter(d => d.platform === 'iPadOS');
   const androidDevices = SUPPORTED_DEVICES.filter(d => d.platform === 'Android');
 
   return (
@@ -160,9 +161,32 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({ config, onChange, onAp
         
         {/* iOS Section */}
         <div className="mb-4">
-            <h4 className="text-xs font-bold text-slate-500 mb-2 border-b border-slate-200 pb-1">iOS Devices</h4>
+            <h4 className="text-xs font-bold text-slate-500 mb-2 border-b border-slate-200 pb-1">iOS Devices (iPhone)</h4>
             <div className="space-y-2">
             {iosDevices.map(device => (
+                <label key={device.id} className="flex items-center space-x-3 cursor-pointer group">
+                <div className="relative flex items-center">
+                    <input
+                    type="checkbox"
+                    className="peer h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 transition duration-150 ease-in-out"
+                    checked={config.selectedDeviceIds.includes(device.id)}
+                    onChange={() => toggleDevice(device.id)}
+                    />
+                </div>
+                <div className="flex-1">
+                    <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">{device.name}</span>
+                    {device.required && <span className="ml-2 text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full font-medium">Required</span>}
+                </div>
+                </label>
+            ))}
+            </div>
+        </div>
+
+        {/* iPad Section */}
+        <div className="mb-4">
+            <h4 className="text-xs font-bold text-slate-500 mb-2 border-b border-slate-200 pb-1">iPad Devices</h4>
+            <div className="space-y-2">
+            {ipadDevices.map(device => (
                 <label key={device.id} className="flex items-center space-x-3 cursor-pointer group">
                 <div className="relative flex items-center">
                     <input

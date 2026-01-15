@@ -5,7 +5,7 @@ import { DeviceDefinition } from './types';
 
 // Source: Apple App Store Connect & Google Play Specifications
 export const SUPPORTED_DEVICES: DeviceDefinition[] = [
-  // --- iOS Devices ---
+  // --- iOS Devices (iPhone) ---
   {
     id: 'iphone-69',
     name: 'iPhone 6.9" Display',
@@ -61,6 +61,58 @@ export const SUPPORTED_DEVICES: DeviceDefinition[] = [
     ],
   },
   
+  // --- iPad Devices ---
+  {
+    id: 'ipad-pro-13',
+    name: 'iPad Pro 13" (M4)',
+    platform: 'iPadOS',
+    required: false,
+    acceptedSizes: [
+      { width: 2064, height: 2752 },
+      { width: 2752, height: 2064 }
+    ],
+  },
+  {
+    id: 'ipad-pro-129',
+    name: 'iPad Pro 12.9" (3rd Gen+)',
+    platform: 'iPadOS',
+    required: true,
+    acceptedSizes: [
+      { width: 2048, height: 2732 },
+      { width: 2732, height: 2048 }
+    ],
+  },
+  {
+    id: 'ipad-pro-11',
+    name: 'iPad Pro 11"',
+    platform: 'iPadOS',
+    required: false,
+    acceptedSizes: [
+      { width: 1668, height: 2388 },
+      { width: 2388, height: 1668 }
+    ],
+  },
+  {
+    id: 'ipad-air-109',
+    name: 'iPad Air 10.9"',
+    platform: 'iPadOS',
+    required: false,
+    acceptedSizes: [
+      { width: 1640, height: 2360 },
+      { width: 2360, height: 1640 }
+    ],
+  },
+  {
+    id: 'ipad-102',
+    name: 'iPad 10.2"',
+    platform: 'iPadOS',
+    required: false,
+    acceptedSizes: [
+      { width: 1620, height: 2160 },
+      { width: 2160, height: 1620 }
+    ],
+  },
+
   // --- Android Devices ---
   {
     id: 'android-phone',

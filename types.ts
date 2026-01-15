@@ -17,7 +17,7 @@ export interface Dimension {
   height: number;
 }
 
-export type Platform = 'iOS' | 'Android';
+export type Platform = 'iOS' | 'Android' | 'iPadOS';
 
 export interface DeviceDefinition {
   id: string;
