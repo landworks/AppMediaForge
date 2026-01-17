@@ -1,4 +1,4 @@
-# iOSMediaForge
+# AppMediaForge
 
 A web-based automation tool to generate App Store Connect-ready screenshots.
 
