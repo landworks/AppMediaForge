@@ -1,71 +1,64 @@
-# AppMediaForge
+# AppMediaForge (v1.3.1)
 
-A web-based automation tool to generate App Store Connect-ready screenshots.
+A web-based automation tool to generate App Store Connect (iPhone & iPad) and Google Play Store ready screenshots.
+
+## Features & Supported Devices (v1.3.1)
+
+This tool automatically resizes, pads/crops, and captions your source screenshots for the following required targets:
+
+**iOS (iPhone)**
+- iPhone 6.9" Display (iPhone 16 Pro Max)
+- iPhone 6.5" Display (iPhone 11 Pro Max / XS Max)
+- iPhone 5.5" Display (iPhone 8 Plus)
+
+**iPadOS (iPad)**
+- iPad Pro 12.9" (3rd Gen+)
+- iPad Pro 13" (M4)
+- iPad Pro 11"
+- iPad Air 10.9"
+- iPad 10.2"
+
+**Android**
+- Android Phones (FHD+)
+- Android Tablets (7" & 10")
+
+**Capabilities**
+- **Panorama Mode:** Split wide marketing images into seamless carousels (2, 3, or 4 screens).
+- **Standard Mode:** Batch process single screenshots.
+- **Client-Side Generation:** Privacy-focused; images are processed entirely in your browser.
+- **ZIP Export:** Downloads a structured ZIP file ready for upload.
 
 ## Deliverables Status
 - **A (Product Spec):** Implemented in UI flow.
-- **B (Architecture):** See below.
-- **C (Data Model):** See `types.ts`.
-- **D (API):** See API Endpoints section.
-- **E (Code):** Frontend scaffold + Server logic provided.
+- **B (Architecture):** Client-side generator active.
+- **C (Data Model):** Updated for iPadOS support.
+- **D (API):** Reference endpoints provided (optional backend).
+- **E (Code):** Full frontend implementation + Server logic reference.
 - **F (Tests):** See `server/generator.test.ts`.
-- **G (Deployment):** See Deployment section.
+- **G (Deployment):** Configured for static hosting.
 
 ## Architecture
 
 1.  **Frontend (Next.js/React):**
     -   Handles user interaction, file selection, and configuration.
-    -   Uses local URL.createObjectURL for instant previews (no upload needed for preview).
-2.  **Backend (Next.js API Routes / Node.js):**
-    -   `/api/upload`: Receives multipart form data.
-    -   `/api/generate`: Receives JSON config + Asset IDs.
-    -   **Processing:**
-        -   Fetches high-res original from Storage (GCS).
-        -   Uses `sharp` to resize/composite images based on `APPLE_DEVICE_CLASSES`.
-        -   Generates localized folders.
-        -   Zips content using `archiver`.
-        -   Uploads ZIP to GCS signed URL.
-3.  **Storage:**
-    -   Google Cloud Storage (GCS) buckets: `ios-media-forge-uploads`, `ios-media-forge-exports`.
-
-## API Endpoints (Deliverable D)
-
-### `POST /api/generate`
-**Request:**
-```json
-{
-  "project_id": "proj_123",
-  "assets": ["asset_1_id", "asset_2_id"],
-  "config": { ...GenerationConfig... }
-}
-```
-**Response:**
-```json
-{
-  "job_id": "job_abc",
-  "status": "processing"
-}
-```
-
-### `GET /api/jobs/:id`
-**Response:**
-```json
-{
-  "status": "completed",
-  "download_url": "https://storage.googleapis.com/..."
-}
-```
+    -   Uses `HTMLCanvasElement` and `Blob` APIs for instant processing in the browser.
+2.  **Output:**
+    -   Generates a structured ZIP file organized by `Platform -> Locale -> Device -> Orientation`.
 
 ## How to Run Locally
 
-1.  **Frontend:**
-    This output is a React SPA scaffold.
+1.  **Install Dependencies:**
     ```bash
     npm install
-    npm run dev
     ```
 
-## Deployment Guide (Hostinger / WordPress)
+2.  **Start Development Server:**
+    ```bash
+    npm run dev
+    ```
+    Access the app at `http://localhost:5173`.
+
+## Deployment Guide (Hostinger / Web Host)
 
 This app is configured as a static site, meaning it runs entirely in the browser and does not require a Node.js server for the basic functionality.
 
@@ -74,46 +67,45 @@ Run the following command on your local machine:
 ```bash
 npm run build
 ```
-This creates a `dist` folder containing the HTML, CSS, and JS files.
+This creates a `dist` folder containing the optimized HTML, CSS, and JS files.
 
-### Method 1: Hostinger Subfolder (Standalone)
-This allows you to access the tool via `yourdomain.com/tools/media-forge`.
-
-1.  Log in to Hostinger -> **File Manager**.
+### Hosting Instructions
+1.  Log in to your hosting provider (e.g., Hostinger) -> **File Manager**.
 2.  Navigate to `public_html`.
-3.  Create a folder named `media-forge` (or whatever you prefer).
+3.  Create a folder named `media-forge` (or your preferred path).
 4.  **Upload** the *contents* of your local `dist` folder into this new folder.
 5.  Visit `www.yourdomain.com/media-forge`.
 
-### Method 2: Embed inside WordPress
-To display the tool inside a WordPress page (keeping your site's header/footer):
-
-1.  Follow **Method 1** to upload the files to a subfolder (e.g., `media-forge`).
-2.  Log in to WordPress Admin.
-3.  Create a new Page.
-4.  Add a **Custom HTML** block.
-5.  Paste the following code:
+### Embedding in WordPress
+To display the tool inside a WordPress page:
+1.  Upload the app as described above.
+2.  Use a **Custom HTML** block in WordPress:
     ```html
     <iframe 
       src="/media-forge/index.html" 
-      style="width: 100%; height: 100vh; min-height: 800px; border: none;" 
+      style="width: 100%; height: 100vh; min-height: 900px; border: none;" 
       title="App Store Asset Manager"
     ></iframe>
     ```
 
-## GCP Deployment (Optional - For Cloud Processing)
+## API / Server-Side (Optional Phase 2)
 
-If you enable the server-side features (Phase 2), follow these steps:
+If you enable server-side features for advanced processing or cloud storage:
 
+### `POST /api/generate`
+**Request:**
+```json
+{
+  "project_id": "proj_123",
+  "assets": ["asset_1_id"],
+  "config": { ...GenerationConfig... }
+}
+```
+
+### GCP Deployment
 1.  **Build Container:**
-    Create a `Dockerfile` that installs dependencies and builds the Next.js app.
-    *Important:* Sharp requires platform-specific binaries. In Dockerfile:
-    `RUN npm install --platform=linux --arch=x64 sharp`
-
+    Create a `Dockerfile` that installs dependencies.
 2.  **Cloud Run:**
     ```bash
     gcloud run deploy ios-media-forge --source . --region us-central1 --allow-unauthenticated
     ```
-
-3.  **Storage:**
-    Enable Cloud Storage API and create buckets. Give the Cloud Run Service Account `Storage Object Admin` role.

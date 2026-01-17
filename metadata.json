@@ -1,5 +1,5 @@
 {
   "name": "AppMediaForge",
-  "description": "A web-based automation tool to generate App Store Connect and Google Play Store ready screenshots across all required display classes from a single base image.",
+  "description": "A web-based automation tool to generate App Store Connect (iPhone & iPad) and Google Play Store ready screenshots across all required display classes from a single base image.",
   "requestFramePermissions": []
 }
