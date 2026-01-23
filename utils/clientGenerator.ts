@@ -3,7 +3,7 @@
  */
 import JSZip from 'jszip';
 import { GenerationConfig, UploadedAsset } from '../types';
-import { SUPPORTED_DEVICES } from '../constants';
+import { SUPPORTED_DEVICES, ICON_DEFINITIONS } from '../constants';
 
 /**
  * Slices a single asset into N vertical parts.
@@ -42,6 +42,53 @@ export const sliceAsset = async (asset: UploadedAsset, count: number): Promise<U
     }
     return newAssets;
 };
+
+/**
+ * Generates App Icons based on a single large input image.
+ */
+export const generateIconsZip = async (asset: UploadedAsset, projectName: string): Promise<string> => {
+    const zip = new JSZip();
+    const sanitizedName = projectName.replace(/[^a-z0-9 _-]/gi, '_').trim() || "Project";
+    const rootFolderName = `AppIcons_${sanitizedName}`;
+    const rootFolder = zip.folder(rootFolderName);
+  
+    const img = new Image();
+    img.src = asset.previewUrl;
+    await img.decode();
+  
+    // Process all defined icons
+    for (const def of ICON_DEFINITIONS) {
+      const canvas = document.createElement('canvas');
+      canvas.width = def.width;
+      canvas.height = def.height;
+      const ctx = canvas.getContext('2d');
+  
+      if (ctx) {
+          // High quality resizing
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, 0, 0, def.width, def.height);
+  
+          const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
+          if (blob) {
+              // Organize by platform in the zip
+              const folderName = def.platform === 'ios' ? 'iOS_Xcode' : (def.platform === 'android' ? 'Android' : 'Web');
+              rootFolder?.folder(folderName)?.file(def.name, blob);
+          }
+      }
+    }
+    
+    // Create a JSON file mapping for reference (optional but helpful)
+    const info = {
+        project: projectName,
+        generatedAt: new Date().toISOString(),
+        sourceImage: asset.file.name
+    };
+    rootFolder?.file('generation_info.json', JSON.stringify(info, null, 2));
+  
+    const content = await zip.generateAsync({ type: "blob" });
+    return URL.createObjectURL(content);
+  };
 
 export const generateAssetsZip = async (assets: UploadedAsset[], config: GenerationConfig, projectName: string): Promise<string> => {
   const zip = new JSZip();

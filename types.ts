@@ -11,6 +11,7 @@ export enum Orientation {
 }
 
 export type GenerationMode = 'standard' | 'panorama';
+export type ToolMode = 'screenshots' | 'icons'; // New: Switch between tools
 
 export interface Dimension {
   width: number;
@@ -18,6 +19,7 @@ export interface Dimension {
 }
 
 export type Platform = 'iOS' | 'Android' | 'iPadOS';
+export type IconPlatform = 'ios' | 'android' | 'web';
 
 export interface DeviceDefinition {
   id: string;
@@ -25,6 +27,14 @@ export interface DeviceDefinition {
   platform: Platform;
   acceptedSizes: Dimension[]; // Multiple accepted sizes
   required: boolean;
+}
+
+export interface IconDefinition {
+  name: string; // e.g. "AppIcon-60x60@3x.png"
+  width: number;
+  height: number;
+  platform: IconPlatform;
+  description?: string; // e.g. "iPhone App (60pt)"
 }
 
 /**
