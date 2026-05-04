@@ -170,7 +170,7 @@ const App: React.FC = () => {
             </div>
             <h1 className="text-lg font-bold text-slate-900 tracking-tight">AppMediaForge</h1>
           </div>
-          <p className="text-xs text-slate-500 mt-1">Ver 1.4.2 - Asset Automation</p>
+          <p className="text-xs text-slate-500 mt-1">Ver 1.4.3 - Asset Automation</p>
         </div>
         
         {/* Navigation Tabs (Tool Switcher) */}
@@ -293,7 +293,7 @@ const App: React.FC = () => {
                  />
              </div>
              <div className="flex items-center space-x-4">
-                 <div className="text-xs text-slate-400">v1.4.2 (Icons + Screens)</div>
+                 <div className="text-xs text-slate-400">v1.4.3 (Icons + Screens)</div>
              </div>
          </header>
 

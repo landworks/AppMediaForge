@@ -1,4 +1,4 @@
-# AppMediaForge (v1.4.2)
+# AppMediaForge (v1.4.3)
 
 A browser-based automation tool for generating App Store Connect, Google Play Store, and web app marketing assets from a single source image.
 
@@ -79,6 +79,10 @@ This tool automatically resizes, pads/crops, and captions your source screenshot
     npm run dev
     ```
     Access the app at `http://localhost:5173`.
+
+## License
+
+AppMediaForge is released under the [MIT License](LICENSE).
 
 ## Deployment Guide (Hostinger / Web Host)
 
