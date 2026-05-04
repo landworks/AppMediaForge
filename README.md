@@ -1,8 +1,27 @@
-# AppMediaForge (v1.3.1)
+# AppMediaForge (v1.4.2)
 
-A web-based automation tool to generate App Store Connect (iPhone & iPad) and Google Play Store ready screenshots.
+A browser-based automation tool for generating App Store Connect, Google Play Store, and web app marketing assets from a single source image.
 
-## Features & Supported Devices (v1.3.1)
+## Live Links
+
+- **Project page:** [https://cnerd.us/projects/appmediaforge](https://cnerd.us/projects/appmediaforge)
+- **Launch the app:** [https://cnerd.us/projects/appmediaforge/index.html](https://cnerd.us/projects/appmediaforge/index.html)
+
+The project page includes the public description, screenshots, feature overview, and security posture. Use the launch link to open the actual AppMediaForge tool.
+
+## What It Does
+
+AppMediaForge helps app developers and small teams create store-ready screenshots and icon bundles without manually resizing, cropping, renaming, and organizing every asset. Everything runs in the browser, so source images stay on the user's machine.
+
+Use it to:
+
+- Generate iPhone, iPad, Android, and web assets from local image files.
+- Create standard screenshot sets or split wide marketing images into panorama-style carousel slices.
+- Add simple captions and background styling.
+- Export organized ZIP files with platform, locale, device, and orientation folders.
+- Generate common iOS, Android, and web icon sizes from one 1024x1024 source image.
+
+## Features & Supported Devices
 
 This tool automatically resizes, pads/crops, and captions your source screenshots for the following required targets:
 
@@ -39,11 +58,14 @@ This tool automatically resizes, pads/crops, and captions your source screenshot
 
 ## Architecture
 
-1.  **Frontend (Next.js/React):**
+1.  **Frontend (Vite + React):**
     -   Handles user interaction, file selection, and configuration.
     -   Uses `HTMLCanvasElement` and `Blob` APIs for instant processing in the browser.
 2.  **Output:**
     -   Generates a structured ZIP file organized by `Platform -> Locale -> Device -> Orientation`.
+3.  **Privacy:**
+    -   No backend is required for the current app.
+    -   Uploaded images are processed locally in the browser and are not sent to a server by the app.
 
 ## How to Run Locally
 
@@ -72,9 +94,9 @@ This creates a `dist` folder containing the optimized HTML, CSS, and JS files.
 ### Hosting Instructions
 1.  Log in to your hosting provider (e.g., Hostinger) -> **File Manager**.
 2.  Navigate to `public_html`.
-3.  Create a folder named `media-forge` (or your preferred path).
+3.  Create a folder named `projects/appmediaforge` (or your preferred path).
 4.  **Upload** the *contents* of your local `dist` folder into this new folder.
-5.  Visit `www.yourdomain.com/media-forge`.
+5.  Visit `www.yourdomain.com/projects/appmediaforge/index.html`.
 
 ### Embedding in WordPress
 To display the tool inside a WordPress page:
@@ -82,7 +104,7 @@ To display the tool inside a WordPress page:
 2.  Use a **Custom HTML** block in WordPress:
     ```html
     <iframe 
-      src="/media-forge/index.html" 
+      src="/projects/appmediaforge/index.html" 
       style="width: 100%; height: 100vh; min-height: 900px; border: none;" 
       title="App Store Asset Manager"
     ></iframe>
