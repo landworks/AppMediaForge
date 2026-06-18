@@ -4,6 +4,9 @@
 import JSZip from 'jszip';
 import { GenerationConfig, UploadedAsset } from '../types';
 import { SUPPORTED_DEVICES, ICON_DEFINITIONS } from '../constants';
+import { drawAnnotations } from './annotations';
+import { getDeviceDimensions } from './deviceDimensions';
+import { getContainDrawRect } from './imageLayout';
 
 /**
  * Slices a single asset into N vertical parts.
@@ -111,11 +114,7 @@ export const generateAssetsZip = async (assets: UploadedAsset[], config: Generat
       const device = SUPPORTED_DEVICES.find(d => d.id === deviceId);
       if (!device) continue;
 
-      const targetDim = device.acceptedSizes[0]; // Use primary size
-      const isPortrait = config.orientation === 'portrait';
-      
-      const singleW = isPortrait ? Math.min(targetDim.width, targetDim.height) : Math.max(targetDim.width, targetDim.height);
-      const singleH = isPortrait ? Math.max(targetDim.width, targetDim.height) : Math.min(targetDim.width, targetDim.height);
+      const { width: singleW, height: singleH } = getDeviceDimensions(device, config.orientation);
 
       // --- PANORAMA LOGIC ---
       if (config.mode === 'panorama') {
@@ -157,24 +156,15 @@ export const generateAssetsZip = async (assets: UploadedAsset[], config: Generat
                 drawY = (totalH - drawH) / 2;
              }
         } else {
-             // FIT logic for wide canvas
-             const hasCaption = !!config.captions['en-US']?.text;
-             const availableH = hasCaption ? totalH * 0.85 : totalH;
-             const offsetY = hasCaption && config.captions['en-US']?.position === 'top' ? totalH * 0.15 : (totalH - availableH) / 2;
-
-             if (imgRatio > totalRatio) {
-                 // Fit to width
-                 drawW = totalW * 0.95; // Small padding
-                 drawH = drawW / imgRatio;
-                 drawX = (totalW - drawW) / 2;
-                 drawY = offsetY + (availableH - drawH) / 2;
-             } else {
-                 // Fit to height
-                 drawH = availableH * 0.95;
-                 drawW = drawH * imgRatio;
-                 drawY = offsetY + (availableH - drawH) / 2;
-                 drawX = (totalW - drawW) / 2;
-             }
+             const caption = config.captions['en-US'];
+             ({ drawX, drawY, drawW, drawH } = getContainDrawRect(
+                img.width,
+                img.height,
+                totalW,
+                totalH,
+                !!caption?.text,
+                caption?.position
+             ));
         }
         ctx.drawImage(img, drawX, drawY, drawW, drawH);
 
@@ -196,6 +186,8 @@ export const generateAssetsZip = async (assets: UploadedAsset[], config: Generat
             ctx.shadowOffsetY = 2;
             ctx.fillText(caption.text, textX, textY);
         }
+
+        drawAnnotations(ctx, config.annotations, totalW, totalH);
 
         // --- SLICING ---
         for (let k = 0; k < count; k++) {
@@ -266,21 +258,15 @@ export const generateAssetsZip = async (assets: UploadedAsset[], config: Generat
                 drawY = (targetH - drawH) / 2;
             }
         } else {
-            const hasCaption = !!config.captions['en-US']?.text;
-            const availableH = hasCaption ? targetH * 0.85 : targetH;
-            const offsetY = hasCaption && config.captions['en-US']?.position === 'top' ? targetH * 0.15 : (targetH - availableH) / 2;
-
-            if (imgRatio > targetRatio) {
-                drawW = targetW * 0.9; 
-                drawH = drawW / imgRatio;
-                drawX = (targetW - drawW) / 2;
-                drawY = offsetY + (availableH - drawH) / 2;
-            } else {
-                drawH = availableH * 0.9;
-                drawW = drawH * imgRatio;
-                drawY = offsetY + (availableH - drawH) / 2;
-                drawX = (targetW - drawW) / 2;
-            }
+            const caption = config.captions['en-US'];
+            ({ drawX, drawY, drawW, drawH } = getContainDrawRect(
+                img.width,
+                img.height,
+                targetW,
+                targetH,
+                !!caption?.text,
+                caption?.position
+            ));
         }
 
         ctx.drawImage(img, drawX, drawY, drawW, drawH);
@@ -302,6 +288,8 @@ export const generateAssetsZip = async (assets: UploadedAsset[], config: Generat
             ctx.shadowOffsetY = 2;
             ctx.fillText(caption.text, textX, textY);
         }
+
+        drawAnnotations(ctx, config.annotations, targetW, targetH);
 
         const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
         if (blob) {

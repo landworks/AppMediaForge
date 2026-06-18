@@ -9,6 +9,7 @@ import { Button } from './components/Button';
 import { IconTool } from './components/IconTool';
 import { GenerationConfig, Orientation, UploadedAsset, ToolMode } from './types';
 import { generateAssetsZip, sliceAsset, generateIconsZip } from './utils/clientGenerator';
+import { DEFAULT_ANNOTATION_CONFIG } from './utils/annotations';
 
 const DEFAULT_CONFIG: GenerationConfig = {
   mode: 'standard',
@@ -26,7 +27,8 @@ const DEFAULT_CONFIG: GenerationConfig = {
         position: 'top',
         fontFamily: 'Arial'
     }
-  }
+  },
+  annotations: DEFAULT_ANNOTATION_CONFIG
 };
 
 const App: React.FC = () => {
@@ -170,7 +172,7 @@ const App: React.FC = () => {
             </div>
             <h1 className="text-lg font-bold text-slate-900 tracking-tight">AppMediaForge</h1>
           </div>
-          <p className="text-xs text-slate-500 mt-1">Ver 1.4.3 - Asset Automation</p>
+          <p className="text-xs text-slate-500 mt-1">Ver 1.4.5 - Asset Automation</p>
         </div>
         
         {/* Navigation Tabs (Tool Switcher) */}
@@ -293,7 +295,7 @@ const App: React.FC = () => {
                  />
              </div>
              <div className="flex items-center space-x-4">
-                 <div className="text-xs text-slate-400">v1.4.3 (Icons + Screens)</div>
+                 <div className="text-xs text-slate-400">v1.4.5 (Icons + Screens)</div>
              </div>
          </header>
 

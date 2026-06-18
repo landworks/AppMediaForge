@@ -1,13 +1,18 @@
-# AppMediaForge (v1.4.3)
+# AppMediaForge (v1.4.5)
 
 A browser-based automation tool for generating App Store Connect, Google Play Store, and web app marketing assets from a single source image.
 
 ## Live Links
 
-- **Project page:** [https://cnerd.us/projects/appmediaforge](https://cnerd.us/projects/appmediaforge)
-- **Launch the app:** [https://cnerd.us/projects/appmediaforge/index.html](https://cnerd.us/projects/appmediaforge/index.html)
+- **Launch the app:** [https://landworkspro.com/tools/AppMediaForge/](https://landworkspro.com/tools/AppMediaForge/)
 
-The project page includes the public description, screenshots, feature overview, and security posture. Use the launch link to open the actual AppMediaForge tool.
+Use the launch link to open the live AppMediaForge tool hosted by LandWorks Pro.
+
+## Screenshots
+
+![AppMediaForge source asset upload screen](docs/images/appmediaforge-source-assets.jpg)
+
+![AppMediaForge iPad output preview](docs/images/appmediaforge-ipad-output-preview.jpg)
 
 ## What It Does
 
@@ -18,6 +23,7 @@ Use it to:
 - Generate iPhone, iPad, Android, and web assets from local image files.
 - Create standard screenshot sets or split wide marketing images into panorama-style carousel slices.
 - Add simple captions and background styling.
+- Add square, circle, and linked numbered callouts with optional outline lines.
 - Export organized ZIP files with platform, locale, device, and orientation folders.
 - Generate common iOS, Android, and web icon sizes from one 1024x1024 source image.
 
@@ -98,18 +104,18 @@ This creates a `dist` folder containing the optimized HTML, CSS, and JS files.
 ### Hosting Instructions
 1.  Log in to your hosting provider (e.g., Hostinger) -> **File Manager**.
 2.  Navigate to `public_html`.
-3.  Create a folder named `projects/appmediaforge` (or your preferred path).
+3.  Create a folder named `tools/AppMediaForge` (or your preferred path).
 4.  **Upload** the *contents* of your local `dist` folder into this new folder.
-5.  Visit `www.yourdomain.com/projects/appmediaforge/index.html`.
+5.  Visit `https://landworkspro.com/tools/AppMediaForge/`.
 
 ### Embedding in WordPress
 To display the tool inside a WordPress page:
 1.  Upload the app as described above.
 2.  Use a **Custom HTML** block in WordPress:
     ```html
-    <iframe 
-      src="/projects/appmediaforge/index.html" 
-      style="width: 100%; height: 100vh; min-height: 900px; border: none;" 
+    <iframe
+      src="/tools/AppMediaForge/"
+      style="width: 100%; height: 100vh; min-height: 900px; border: none;"
       title="App Store Asset Manager"
     ></iframe>
     ```

@@ -48,6 +48,43 @@ export interface CaptionConfig {
   fontFamily: string;
 }
 
+export type AnnotationShapeType = 'square' | 'circle' | 'number';
+export type AnnotationLineStyle = 'solid' | 'none';
+
+export interface AnnotationLineConfig {
+  style: AnnotationLineStyle;
+  color: string;
+  width: number;
+}
+
+export interface ShapeAnnotationStyle {
+  fillColor: string;
+  fillOpacity: number;
+  line: AnnotationLineConfig;
+}
+
+export interface NumberAnnotationStyle {
+  fillColor: string;
+  textColor: string;
+  fontSize: number;
+  line: AnnotationLineConfig;
+}
+
+export interface AnnotationItem {
+  id: string;
+  type: AnnotationShapeType;
+  x: number;
+  y: number;
+  size: number;
+}
+
+export interface AnnotationConfig {
+  items: AnnotationItem[];
+  square: ShapeAnnotationStyle;
+  circle: ShapeAnnotationStyle;
+  number: NumberAnnotationStyle;
+}
+
 export interface GenerationConfig {
   mode: GenerationMode; // New: Standard or Panorama
   panoramaCount: number; // New: 2, 3, or 4 screens
@@ -60,6 +97,7 @@ export interface GenerationConfig {
     value: string; // Hex or CSS gradient string
   };
   captions: Record<string, CaptionConfig>; // Locale -> Config
+  annotations: AnnotationConfig;
 }
 
 export interface UploadedAsset {

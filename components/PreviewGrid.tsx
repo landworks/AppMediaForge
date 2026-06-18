@@ -4,11 +4,76 @@
 import React, { useMemo } from 'react';
 import { DeviceDefinition, GenerationConfig, UploadedAsset } from '../types';
 import { SUPPORTED_DEVICES } from '../constants';
+import { getNumberSequence, hexToRgba, normalizeAnnotationConfig } from '../utils/annotations';
+import { getDeviceDimensions } from '../utils/deviceDimensions';
 
 interface PreviewGridProps {
   assets: UploadedAsset[];
   config: GenerationConfig;
 }
+
+const AnnotationOverlay: React.FC<{ config: GenerationConfig; aspectRatio: number }> = ({ config, aspectRatio }) => {
+  const annotations = normalizeAnnotationConfig(config.annotations);
+  const sizeCorrection = aspectRatio >= 1 ? 1 / aspectRatio : 1;
+
+  if (annotations.items.length === 0) return null;
+
+  return (
+    <div className="absolute inset-0 z-30 pointer-events-none">
+      {annotations.items.map(item => {
+        const sizePercent = item.size * sizeCorrection;
+        const lineStyle = item.type === 'number'
+          ? annotations.number.line
+          : item.type === 'square'
+            ? annotations.square.line
+            : annotations.circle.line;
+        const border = lineStyle.style === 'none'
+          ? 'none'
+          : `${Math.max(1, lineStyle.width * 2)}px solid ${lineStyle.color}`;
+
+        if (item.type === 'number') {
+          return (
+            <div
+              key={item.id}
+              className="absolute flex items-center justify-center rounded-full font-bold shadow-sm"
+              style={{
+                left: `${item.x}%`,
+                top: `${item.y}%`,
+                width: `${sizePercent}%`,
+                aspectRatio: '1 / 1',
+                transform: 'translate(-50%, -50%)',
+                backgroundColor: annotations.number.fillColor,
+                color: annotations.number.textColor,
+                border,
+                fontSize: `${Math.max(10, annotations.number.fontSize / 2)}px`
+              }}
+            >
+              {getNumberSequence(annotations.items, item.id)}
+            </div>
+          );
+        }
+
+        const style = item.type === 'square' ? annotations.square : annotations.circle;
+
+        return (
+          <div
+            key={item.id}
+            className={`absolute shadow-sm ${item.type === 'circle' ? 'rounded-full' : ''}`}
+            style={{
+              left: `${item.x}%`,
+              top: `${item.y}%`,
+              width: `${sizePercent}%`,
+              aspectRatio: '1 / 1',
+              transform: 'translate(-50%, -50%)',
+              backgroundColor: hexToRgba(style.fillColor, style.fillOpacity),
+              border
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+};
 
 // Helper to simulate CSS based on config for immediate visual feedback
 const SimulatedPreview: React.FC<{ 
@@ -17,11 +82,7 @@ const SimulatedPreview: React.FC<{
   device: DeviceDefinition 
 }> = ({ asset, config, device }) => {
   
-  // Find the largest accepted size for aspect ratio calculation
-  const targetSize = device.acceptedSizes[0];
-  const isPortrait = config.orientation === 'portrait';
-  const width = isPortrait ? Math.min(targetSize.width, targetSize.height) : Math.max(targetSize.width, targetSize.height);
-  const height = isPortrait ? Math.max(targetSize.width, targetSize.height) : Math.min(targetSize.width, targetSize.height);
+  const { width, height } = getDeviceDimensions(device, config.orientation);
   const aspectRatio = width / height;
   
   const bgStyle: React.CSSProperties = config.background.type === 'solid' 
@@ -76,10 +137,9 @@ const SimulatedPreview: React.FC<{
                                         alt="Preview" 
                                         className="max-w-none transition-transform duration-300"
                                         style={{ 
-                                            width: config.fitMode === 'cover' ? '100%' : 'auto',
-                                            height: config.fitMode === 'cover' ? 'auto' : (config.fitMode === 'contain' ? '90%' : '100%'), // 90% for padding in contain
-                                            objectFit: config.fitMode === 'cover' ? 'cover' : 'contain',
-                                            minHeight: config.fitMode === 'cover' ? '100%' : '0'
+                                            width: '100%',
+                                            height: '100%',
+                                            objectFit: config.fitMode === 'cover' ? 'cover' : 'contain'
                                         }}
                                       />
                                       
@@ -99,6 +159,8 @@ const SimulatedPreview: React.FC<{
                                             </span>
                                         </div>
                                       )}
+
+                                      <AnnotationOverlay config={config} aspectRatio={aspectRatio * count} />
                                  </div>
                              </div>
                          </div>
@@ -147,6 +209,8 @@ const SimulatedPreview: React.FC<{
              </span>
            </div>
         )}
+
+        <AnnotationOverlay config={config} aspectRatio={aspectRatio} />
 
         <div className="absolute bottom-2 right-2 z-30 bg-black/50 text-white text-[10px] px-1.5 py-0.5 rounded">
           {width}x{height}
